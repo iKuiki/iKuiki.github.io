@@ -12,10 +12,12 @@ RUN gem sources --add https://gems.ruby-china.com/ --remove https://rubygems.org
 RUN bundle config mirror.https://rubygems.org https://gems.ruby-china.com
 
 # Install git, process tools, zsh and then Clean up
-RUN apt-get update && apt-get -y install git procps zsh less \
+RUN apt-get update && apt-get -y install git procps zsh less locales \
     && apt-get autoremove -y \
     && apt-get clean -y \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && echo 'zh_CN.UTF-8 UTF-8' >> /etc/locale.gen \
+    && locale-gen
 
 # Install Oh-My-Zsh
 RUN sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
