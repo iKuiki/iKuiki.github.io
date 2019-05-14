@@ -1,0 +1,10 @@
+// See https://aka.ms/vscode-remote/devcontainer.json for format details.
+{
+	"name": "Ruby 2",
+	"dockerFile": "Dockerfile",
+	"extensions": [
+		"yzhang.markdown-all-in-one",
+		"sissel.shopify-liquid"
+	],
+	"postCreateCommand": "bundle install"
+}
