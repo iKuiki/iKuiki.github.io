@@ -19,6 +19,9 @@ RUN apt-get update && apt-get -y install git procps zsh less locales \
     && echo 'zh_CN.UTF-8 UTF-8' >> /etc/locale.gen \
     && locale-gen
 
+# Set time zone
+ENV TZ=Asia/Shanghai
+
 # Install Oh-My-Zsh
 RUN sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
