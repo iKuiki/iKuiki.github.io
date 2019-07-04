@@ -24,3 +24,5 @@ RUN sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/too
 
 # Install jekyll
 RUN gem install jekyll bundler
+
+ENV SHELL /bin/zsh
