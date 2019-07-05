@@ -39,3 +39,6 @@ plugins:
 #   - vendor/cache/
 #   - vendor/gems/
 #   - vendor/ruby/
+
+icp_licence: "粤ICP备17131790号" # if not empty, will show at footer of page
+author: "Kuiki"
