@@ -19,4 +19,4 @@ tags:
 解决方法如下：
 首先将git设置为fileMode不敏感：```git config core.fileMode false```（注意不可全局设置，因为vscode挂载了全局的gitconfig文件，全局设置会无法写入
 
-在add文件时也要注意，如果add的文件是755权限，但是并没有x权限需求，就应该手动执行```git update-index --chmod=-x xxx.xx```来去除x权限
+在add文件时也要注意，如果add的文件是755权限，但是并没有x权限需求，就应该手动执行```git update-index --chmod=-x xxx.xx```来去除x权限，反之，因为设置了fileMode false，添加文件时默认权限其实是644，遇到需要执行权限的文件则应该手动执行```git update-index --chmod=+x xxx.xx```来赋予x权限
