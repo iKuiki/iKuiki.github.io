@@ -11,6 +11,9 @@ RUN gem sources --add https://gems.ruby-china.com/ --remove https://rubygems.org
 # Set china source for bundle
 RUN bundle config mirror.https://rubygems.org https://gems.ruby-china.com
 
+RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
+RUN sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
+
 # Install git, process tools, zsh and then Clean up
 RUN apt-get update && apt-get -y install git procps zsh less locales \
     && apt-get autoremove -y \
