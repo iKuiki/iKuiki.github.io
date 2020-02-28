@@ -3,7 +3,7 @@ layout: post
 title: Win10无法输入中文
 date: '2020-02-27 12:05:00'
 tags:
-- openwrt
+- windows10
 ---
 
 # Win10无法输入中文
