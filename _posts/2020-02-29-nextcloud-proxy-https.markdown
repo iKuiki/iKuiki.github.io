@@ -21,4 +21,4 @@ Nextcloud是一款几位好用的webBase网盘，其极佳的客户端可以带�
 
 配置完成后，即可发现Nextcloud会强制生成https形式的url.
 
-更多配置可以查看```/var/www/html/config/config.simple.php```，其中有很多未在config.php中列出的配置。
+更多配置可以查看```/var/www/html/config/config.sample.php```，其中有很多未在config.php中列出的配置。
