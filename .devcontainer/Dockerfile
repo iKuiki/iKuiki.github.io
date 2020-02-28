@@ -15,7 +15,7 @@ RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
 RUN sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
 
 # Install git, process tools, zsh and then Clean up
-RUN apt-get update && apt-get -y install git procps zsh less locales \
+RUN apt-get update && apt-get -y install git vim procps zsh less locales \
     && apt-get autoremove -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/* \
