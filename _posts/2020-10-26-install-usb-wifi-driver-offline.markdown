@@ -22,7 +22,7 @@ sudo apt install xfce4 xinit xdm
 # 安装完成后重启即可
 reboot
 # 为了方便显示中文，安装中文包
-sudo apt install language-pack-zh-hans tty-wqy-zenhei
+sudo apt install language-pack-zh-hans fonts-wqy-zenhei
 
 # 安装make相关组建
 sudo apt install make gcc git
