@@ -1,0 +1,147 @@
+---
+layout: post
+title: 升级K8S集群
+date: '2020-12-15 21:22:00'
+tags:
+- Linux
+- CentOS
+- K8S
+---
+
+# 升级K8S集群
+
+社区的K8S集群已经发布到20了，家里的K8S集群版本还停留在17，所以决定升级一下家里的K8S服务器集群。
+
+首先我们需要参考K8S官方文档
+最新的[官方升级文档](https://kubernetes.io/zh/docs/tasks/administer-cluster/kubeadm/kubeadm-upgrade/)是19升级到20的
+但是由于我的集群当前还停留在17版本
+所以参考[v18版本的文档](https://v1-18.docs.kubernetes.io/zh/docs/tasks/administer-cluster/kubeadm/kubeadm-upgrade/)来进行升级
+
+在大陆的网络环境下，升级容易遇到网络问题，所以需要增加一个预先拉取镜像的步骤，主节点的升级步骤可参考下文。
+
+## 升级K8S管理工具kubeadm
+
+``` bash
+yum install -y kubeadm-1.18.13-0 --disableexcludes=kubernetes
+```
+
+## 腾空控制面
+
+``` bash
+# 假设k8s-master1是控制面节点1的名称
+kubectl drain k8s-master1 --ignore-daemonsets
+```
+
+## 创建升级计划(在master1上即可)
+
+``` bash
+sudo kubeadm upgrade plan
+```
+
+当前我要升级的版本为1.18.13，执行完成后会返回如下升级计划明细
+
+```
+[upgrade/config] Making sure the configuration is correct:
+[upgrade/config] Reading configuration from the cluster...
+[upgrade/config] FYI: You can look at this config file with 'kubectl -n kube-system get cm kubeadm-config -oyaml'
+[preflight] Running pre-flight checks.
+[upgrade] Running cluster health checks
+[upgrade] Fetching available versions to upgrade to
+[upgrade/versions] Cluster version: v1.17.2
+[upgrade/versions] kubeadm version: v1.18.13
+I1215 22:01:21.099928   10970 version.go:252] remote version is much newer: v1.20.0; falling back to: stable-1.18
+[upgrade/versions] Latest stable version: v1.18.13
+[upgrade/versions] Latest stable version: v1.18.13
+[upgrade/versions] Latest version in the v1.17 series: v1.17.15
+[upgrade/versions] Latest version in the v1.17 series: v1.17.15
+
+Components that must be upgraded manually after you have upgraded the control plane with 'kubeadm upgrade apply':
+COMPONENT   CURRENT       AVAILABLE
+Kubelet     5 x v1.17.2   v1.17.15
+            1 x v1.17.3   v1.17.15
+
+Upgrade to the latest version in the v1.17 series:
+
+COMPONENT            CURRENT   AVAILABLE
+API Server           v1.17.2   v1.17.15
+Controller Manager   v1.17.2   v1.17.15
+Scheduler            v1.17.2   v1.17.15
+Kube Proxy           v1.17.2   v1.17.15
+CoreDNS              1.6.5     1.6.7
+Etcd                 3.4.3     3.4.3-0
+
+You can now apply the upgrade by executing the following command:
+
+	kubeadm upgrade apply v1.17.15
+
+_____________________________________________________________________
+
+Components that must be upgraded manually after you have upgraded the control plane with 'kubeadm upgrade apply':
+COMPONENT   CURRENT       AVAILABLE
+Kubelet     5 x v1.17.2   v1.18.13
+            1 x v1.17.3   v1.18.13
+
+Upgrade to the latest stable version:
+
+COMPONENT            CURRENT   AVAILABLE
+API Server           v1.17.2   v1.18.13
+Controller Manager   v1.17.2   v1.18.13
+Scheduler            v1.17.2   v1.18.13
+Kube Proxy           v1.17.2   v1.18.13
+CoreDNS              1.6.5     1.6.7
+Etcd                 3.4.3     3.4.3-0
+
+You can now apply the upgrade by executing the following command:
+
+	kubeadm upgrade apply v1.18.13
+
+_____________________________________________________________________
+```
+
+## 预先拉取镜像
+
+由于国内网络环境的问题，我们需要预先拉取需要的版本的k8s镜像
+执行以下命令获取到所有要拉取的镜像列表
+注意，**由于只有master1执行了生成升级计划的任务，所以以下命令也必须在master1上执行**
+
+```
+kubeadm config images list
+```
+
+例如，我当前要升级的版本为1.18.13，则执行结果如下
+
+```
+k8s.gcr.io/kube-apiserver:v1.18.13
+k8s.gcr.io/kube-controller-manager:v1.18.13
+k8s.gcr.io/kube-scheduler:v1.18.13
+k8s.gcr.io/kube-proxy:v1.18.13
+k8s.gcr.io/pause:3.2
+k8s.gcr.io/etcd:3.4.3-0
+k8s.gcr.io/coredns:1.6.7
+```
+
+将以上输出写入到images.txt中,并将其拷贝到所有节点上，并且在所有节点执行以下指令：
+```
+sudo -i # 切root方便操作docker
+for  i  in  `cat images.txt`;  do
+    imageName=${i#k8s.gcr.io/}
+    docker pull registry.aliyuncs.com/google_containers/$imageName
+    docker tag registry.aliyuncs.com/google_containers/$imageName k8s.gcr.io/$imageName
+    docker rmi registry.aliyuncs.com/google_containers/$imageName
+done;
+exit # 退出root
+```
+
+执行完成后可以删除images.txt
+
+## 执行升级
+
+首先在主节点上执行如下指令应用升级
+```
+sudo kubeadm upgrade apply v1.18.13
+```
+
+## 取消对该控制面节点的保护
+```
+kubectl uncordon k8s-master1
+```
