@@ -145,3 +145,15 @@ sudo kubeadm upgrade apply v1.18.13
 ```
 kubectl uncordon k8s-master1
 ```
+
+## 升级kubectl与kubelet
+
+```
+yum install -y kubelet-1.18.13-0 kubectl-1.18.13-0 --disableexcludes=kubernetes
+```
+
+重启
+```
+sudo systemctl daemon-reload
+sudo systemctl restart kubelet
+```
