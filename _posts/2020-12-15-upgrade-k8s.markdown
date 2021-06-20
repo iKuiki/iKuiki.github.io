@@ -121,13 +121,18 @@ k8s.gcr.io/coredns:1.6.7
 ```
 
 将以上输出写入到images.txt中,并将其拷贝到所有节点上，并且在所有节点执行以下指令：
+注意：因k8s输出的image list突然变更了coredns的路径，所以在使用阿里镜像时比之前需要做一些变更
 ```
 sudo -i # 切root方便操作docker
 for  i  in  `cat images.txt`;  do
     imageName=${i#k8s.gcr.io/}
-    docker pull registry.aliyuncs.com/google_containers/$imageName
-    docker tag registry.aliyuncs.com/google_containers/$imageName k8s.gcr.io/$imageName
-    docker rmi registry.aliyuncs.com/google_containers/$imageName
+    # 处理某些格式不相符的问题
+    pullName=$imageName
+    # google容器镜像下的coredns的版本号带有v，而阿里的镜像下没有，且层级也不相同
+    if [[ $pullName =~ "coredns/coredns:v" ]]; then pullName=${pullName/coredns\/coredns:v/coredns:};fi
+    docker pull registry.aliyuncs.com/google_containers/$pullName
+    docker tag registry.aliyuncs.com/google_containers/$pullName k8s.gcr.io/$imageName
+    docker rmi registry.aliyuncs.com/google_containers/$pullName
 done;
 exit # 退出root
 ```
