@@ -27,15 +27,14 @@ etcdctl  --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etc
 etcdctl  --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etcd/peer.crt --key=/etc/kubernetes/pki/etcd/peer.key member remove ce2375f7f5372dd
 
 # 然后，登陆到master1上，重新生成证书、token
-# 生成证书
+# 生成证书(注意，这句命令执行完会返回证书的certificate-key，需要记下来之后会用到)
 sudo kubeadm init phase upload-certs --upload-certs
-# 生成join的token
+# 生成join的token(注意，这句命令执行完后会返回之后join时的token与token-ca-cert，需要记录下来之后会用)
 sudo kubeadm token create --print-join-command
-# 注意，上面这条命令会返回join命令，需要记录，后面会用到
 
 # 然后登陆到master3上，执行join操作
 # join之前首先需要reset
 sudo kubeadm reset
-# 然后用刚刚上上步返回的命令来join
-sudo kubeadm join 192.168.1.77:6443 --token xxxx.xxxxxxxxxx --discovery-token-ca-cert-hash sha256:xxxxxxxxxx
+# 然后用刚刚上上步返回的命令来join，并加上--control-plane与上面的证书Key
+sudo kubeadm join 192.168.1.77:6443 --token xxxx.xxxxxxxxxx --discovery-token-ca-cert-hash sha256:xxxxxxxxxx --control-plane --certificate-key xxxxxx
 ```
