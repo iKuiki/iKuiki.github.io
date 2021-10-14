@@ -24,7 +24,7 @@ sudo docker exec -it $(sudo docker ps -f name=etcd_etcd -q) /bin/sh
 # 在etcd终端下查看etcd成员列表
 etcdctl  --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etcd/peer.crt --key=/etc/kubernetes/pki/etcd/peer.key member list
 # 移除master3对应的member
-etcdctl  --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etcd/peer.crt --key=/etc/kubernetes/pki/etcd/peer.key member remove ce2375f7f5372dd
+etcdctl  --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etcd/peer.crt --key=/etc/kubernetes/pki/etcd/peer.key member remove xxxxxx
 
 # 然后，登陆到master1上，重新生成证书、token
 # 生成证书(注意，这句命令执行完会返回证书的certificate-key，需要记下来之后会用到)
@@ -36,5 +36,5 @@ sudo kubeadm token create --print-join-command
 # join之前首先需要reset
 sudo kubeadm reset
 # 然后用刚刚上上步返回的命令来join，并加上--control-plane与上面的证书Key
-sudo kubeadm join 192.168.1.77:6443 --token xxxx.xxxxxxxxxx --discovery-token-ca-cert-hash sha256:xxxxxxxxxx --control-plane --certificate-key xxxxxx
+sudo kubeadm join 192.168.1.xx:6443 --token xxxx.xxxxxxxxxx --discovery-token-ca-cert-hash sha256:xxxxxxxxxx --control-plane --certificate-key xxxxxx
 ```
